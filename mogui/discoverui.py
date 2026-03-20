@@ -69,14 +69,20 @@ class DiscoverDialog(QtWidgets.QDialog):
         thread.start()
 
     def _search(self):
+        count = 0
         try:
             for addr, info in mogdiscover.find_usb(self.filter, abort=lambda: self._abort):
                 self.deviceFound.emit(addr, info)
+                count += 1
             for addr, info in mogdiscover.find_eth(self.filter, abort=lambda: self._abort):
                 self.deviceFound.emit(addr, info)
+                count += 1
         except Exception as e:
             logger.warning("Discovery error: %s" % e)
-        self.status.setText("Search complete. Double-click a device or enter address manually.")
+        if count == 0:
+            self.status.setText("No devices found. Try entering COM port (e.g. COM6) or IP manually.")
+        else:
+            self.status.setText("Found %d device(s). Double-click or select and Connect." % count)
 
     def _add_device(self, addr, info):
         self.device_list.addItem("%s - %s" % (addr, info))

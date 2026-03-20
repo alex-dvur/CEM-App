@@ -27,18 +27,23 @@ def check_filter(info, filter):
     return any(x in parts[0] for x in filter)
 
 
-def check_connection(addr, filter=None, name=None, timeout=1):
+def check_connection(addr, filter=None, name=None, timeout=2):
     try:
+        logging.info("Trying to connect to %s (timeout=%s)" % (addr, timeout))
         dev = MOGDevice(addr, timeout=timeout, check=True)
         info = dev.ask("INFO")
+        logging.info("Device at %s responded: %s" % (addr, info))
         if not check_filter(info, filter):
+            logging.info("Device at %s filtered out (filter=%s)" % (addr, filter))
             dev.close()
             return None
         if name is not None and name not in info:
+            logging.info("Device at %s name mismatch (wanted %s)" % (addr, name))
             dev.close()
             return None
         return (addr, info)
-    except Exception:
+    except Exception as e:
+        logging.warning("Failed to connect to %s: %s" % (addr, e))
         return None
 
 
