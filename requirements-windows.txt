@@ -1,0 +1,8 @@
+PySide2==5.15.2.1
+numpy
+scipy
+matplotlib
+pyqtgraph
+pyserial
+psutil
+pyinstaller==5.13.2
